@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alpian.paymentws.domain.CustomerAccount;
 import com.alpian.paymentws.dto.CustomerAccountDTO;
@@ -16,6 +17,7 @@ import com.alpian.paymentws.repository.CustomerAccountRepository;
  * Service layer for Customer Account CRUD and credit operations.
  * Maps between CustomerAccountDTO and CustomerAccount entity using ModelMapper.
  */
+@Transactional
 @Service
 public class CustomerAccountService {
 	private final CustomerAccountRepository customerAccountRepository;
@@ -35,7 +37,7 @@ public class CustomerAccountService {
         CustomerAccount customerAccount = modelMapper.map(dto, CustomerAccount.class);
         customerAccount.setCustomerId(customerId);
         customerAccount.setAvailableAmount(BigDecimal.ZERO);
-        CustomerAccount saved = customerAccountRepository.save(customerAccount);
+        CustomerAccount saved = customerAccountRepository.saveAndFlush(customerAccount);
         return modelMapper.map(saved, CustomerAccountDTO.class);
     }
     
@@ -44,7 +46,7 @@ public class CustomerAccountService {
                 .orElseThrow(() -> new CustomerAccountNotFoundException("Customer account not found for customer: " + customerId));
     	
     	existing.setAvailableAmount(existing.getAvailableAmount().add(amount));
-    	CustomerAccount saved = customerAccountRepository.save(existing);
+    	CustomerAccount saved = customerAccountRepository.saveAndFlush(existing);
     	return modelMapper.map(saved, CustomerAccountDTO.class);
     }
     

@@ -7,11 +7,13 @@ import com.alpian.paymentws.exception.CustomerNotFoundException;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service layer for Customer CRUD and search operations.
  * Maps between CustomerDTO and Customer entity using ModelMapper.
  */
+@Transactional
 @Service
 public class CustomerService {
 
@@ -26,7 +28,7 @@ public class CustomerService {
     public CustomerDTO createCustomer(CustomerDTO dto) {
         Customer customer = modelMapper.map(dto, Customer.class);
         customer.setPspReference(null);
-        Customer saved = customerRepository.save(customer);
+        Customer saved = customerRepository.saveAndFlush(customer);
         return modelMapper.map(saved, CustomerDTO.class);
     }
 
@@ -39,7 +41,7 @@ public class CustomerService {
         existing.setEmail(dto.getEmail());
         existing.setPhoneNumber(dto.getPhoneNumber());
 
-        Customer saved = customerRepository.save(existing);
+        Customer saved = customerRepository.saveAndFlush(existing);
         return modelMapper.map(saved, CustomerDTO.class);
     }
 
@@ -86,7 +88,7 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found: " + id));
     	
     	customer.setPspReference(pspReference);
-        Customer saved = customerRepository.save(customer);
+        Customer saved = customerRepository.saveAndFlush(customer);
         return modelMapper.map(saved, CustomerDTO.class);
     }
 
