@@ -129,7 +129,7 @@ public class PaymentService {
 				// TODO To be improved adding other aspects
 				Optional<PaymentIntent> opt = paymentIntentRepository.findAll().stream().filter(pi -> pi.getCustomerId().equals(customerId)
 						&& pi.getAmount().compareTo(context.getRight().getAmount()) == 0).findFirst();
-				PaymentIntent paymentIntent = opt.orElse(new PaymentIntent());
+				PaymentIntent paymentIntent = opt.orElse(null);
 				return paymentIntent != null? modelMapper.map(paymentIntent, PaymentIntentDTO.class) : null;
 			}
     	};
@@ -151,7 +151,7 @@ public class PaymentService {
             	paymentIntent.setAmountCapturable(result.getAmount());
             }
             
-            paymentIntent = paymentIntentRepository.save(paymentIntent);
+            paymentIntent = paymentIntentRepository.saveAndFlush(paymentIntent);
             
             PaymentNotificationDTO paymentNotificationDTO = new PaymentNotificationDTO(customerId, customerDTO.getFirstName(),
             		customerDTO.getLastName(), customerDTO.getEmail(),
@@ -205,7 +205,7 @@ public class PaymentService {
 				// TODO To be improved adding other aspects
 				Optional<PaymentIntent> opt = paymentIntentRepository.findAll().stream().filter(pi -> pi.getCustomerId().equals(customerId)
 						&& pi.getAmount().compareTo(context.getRight().getAmount()) == 0).findFirst();
-				PaymentIntent paymentIntent = opt.orElse(new PaymentIntent());
+				PaymentIntent paymentIntent = opt.orElse(null);
 				return paymentIntent != null? modelMapper.map(paymentIntent, PaymentIntentDTO.class) : null;
 			}
 
@@ -226,7 +226,7 @@ public class PaymentService {
             paymentIntent.setCurrency(dto.getCurrency());
             paymentIntent.setAmountReceived(result.getAmount());
             
-            paymentIntent = paymentIntentRepository.save(paymentIntent);
+            paymentIntent = paymentIntentRepository.saveAndFlush(paymentIntent);
             
             customerAccountService.subtractMoneyFromCustomer(customerId, dto.getAmount());
             
