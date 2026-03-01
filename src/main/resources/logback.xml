@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
+        by default -->
+        <encoder>
+            <pattern>%date{"yyyy-MM-dd'T'HH:mm:ss,SSSXXX", UTC}  [%thread] %highlight(%-5level) %cyan(%logger{36}) %green(%method@%line)  %X{fleetId} %X{sessionId} %X{userId} %X{transactionId} - %msg%n%rEx{
+                }</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.alpian" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
