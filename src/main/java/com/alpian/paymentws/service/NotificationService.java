@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class NotificationService {
-	private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NotificationService.class);
 
 	public <V> void notify(String topicName, String key, V value) {
 		try {
+			LOG.info("Sending notification for topicName {}, key {}, value {}", topicName, key, value);
+			
 			Properties props = new Properties();
 	        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 	        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -30,16 +32,16 @@ public class NotificationService {
 	
 	            producer.send(record, (metadata, exception) -> {
 	                if (exception == null) {
-	                	log.info("Notification sent to partition {}, offset {}",
+	                	LOG.info("Notification sent to partition {}, offset {}",
 	                        metadata.partition(), metadata.offset());
 	                } else {
-	                	log.error(String.format("Error sending notification to %s for key %s", topicName, key), exception);
+	                	LOG.error(String.format("Error sending notification to %s for key %s", topicName, key), exception);
 	                }
 	            });
 	        }
 		} catch (Exception e) {
 			// We should not propagate notification problems assuring previous changes
-            log.error("Failed to publish notification to {} for key {}", topicName, key, e);
+			LOG.error("Failed to publish notification to {} for key {}", topicName, key, e);
         }
 	}
 }

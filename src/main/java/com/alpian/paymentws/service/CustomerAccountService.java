@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import com.alpian.paymentws.repository.CustomerAccountRepository;
 @Transactional
 @Service
 public class CustomerAccountService {
+	private final Logger LOG = LoggerFactory.getLogger(CustomerAccountService.class);
+	
 	private final CustomerAccountRepository customerAccountRepository;
     private final ModelMapper modelMapper;
 
@@ -54,11 +58,13 @@ public class CustomerAccountService {
     	CustomerAccount existing = customerAccountRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new CustomerAccountNotFoundException("Customer account not found for customer: " + customerId));
     	
+    	LOG.info("Subtracting " + amount + " from customer " + customerId + " (Amount of money on account before deduction: " + existing.getAvailableAmount() + ")");
+    	
     	customerAccountRepository.subtractAmount(customerId, amount);
     	
     	existing = customerAccountRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new CustomerAccountNotFoundException("Customer account not found for customer: " + customerId));
- 
+    	
     	return modelMapper.map(existing, CustomerAccountDTO.class);
     }
     

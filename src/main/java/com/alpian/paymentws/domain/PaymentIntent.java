@@ -124,4 +124,14 @@ public class PaymentIntent {
     public void setPaymentResponses(List<PaymentResponse> paymentResponses) {
         this.paymentResponses = paymentResponses != null ? paymentResponses : new ArrayList<>();
     }
+
+	@Override
+	public String toString() {
+		return "PaymentIntent [id=" + id + ", customerId=" + customerId + ", pspReference=" + pspReference + ", amount="
+				+ amount + ", currency=" + currency + ", amountCapturable=" + amountCapturable + ", amountReceived="
+				+ amountReceived + ", paymentRequests=" + paymentRequests + ", paymentResponses=" + paymentResponses
+				+ "]";
+	}
+    
+    
 }

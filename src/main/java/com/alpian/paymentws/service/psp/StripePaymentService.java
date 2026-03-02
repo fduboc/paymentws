@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class StripePaymentService implements ProviderPaymentService {
+	private final Logger LOG = LoggerFactory.getLogger(StripePaymentService.class);
+	
 	private static final String MD_CUSTOMER_ID = "MD_CUSTOMER_ID";
 	private static final String TEST_IBAN = "CH9300762011623852957";
 	
@@ -108,6 +112,9 @@ public class StripePaymentService implements ProviderPaymentService {
 		                .build()
 		        )
 			.build();
+    	
+    	LOG.info("Adding payment on Stripe for paymentMethodId {},  amountInCents {}, currency {} and customerId {}",
+    			paymentMethodId, amountInCents, currency, customerId);
 			
 		return PaymentIntent.create(createParams, requestOptions);
 	}

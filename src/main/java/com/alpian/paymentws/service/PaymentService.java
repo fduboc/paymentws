@@ -25,6 +25,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Service
 public class PaymentService {
+	private final Logger LOG = LoggerFactory.getLogger(PaymentService.class);
+	
 	@Autowired
     private AutowireCapableBeanFactory beanFactory;
 	
@@ -192,6 +196,8 @@ public class PaymentService {
             throw new CustomerNotAttachedException("Customer has no PSP reference attached: " + customerId);
         }
         
+        LOG.info("SEPA payment for customer " + customerId + ": " + dto);
+        
     	// This redis lock should avoid handling the same payment requirement more than once handling concurrency issues
     	LockManager<PaymentIntentDTO, Pair<String, CreateSEPAPaymentDTO>> lockManager = new LockManager<PaymentIntentDTO, Pair<String, CreateSEPAPaymentDTO>>() {
 
@@ -216,8 +222,7 @@ public class PaymentService {
     	PaymentIntentDTO paymentIntentDTO = lockManager.withLock(Pair.of(customerId, dto), () -> {	
             ProviderPaymentService provider = paymentServiceFactory.getPaymentProviderService();
             CreatePaymentIntentResult result = provider.createSEPAPaymentIntent(pspReference, dto.getAmount(), dto.getCurrency(), customerDTO.getFirstName(),
-            		customerDTO.getLastName(), customerDTO.getEmail(), customerDTO.getPhoneNumber());
-            
+            		customerDTO.getLastName(), customerDTO.getEmail(), customerDTO.getPhoneNumber());          
             
             PaymentIntent paymentIntent = new PaymentIntent();
             paymentIntent.setCustomerId(customerId);
@@ -227,6 +232,8 @@ public class PaymentService {
             paymentIntent.setAmountReceived(result.getAmount());
             
             paymentIntent = paymentIntentRepository.saveAndFlush(paymentIntent);
+            
+            LOG.info("Created payment intent: " + paymentIntent);
             
             customerAccountService.subtractMoneyFromCustomer(customerId, dto.getAmount());
             

@@ -53,4 +53,12 @@ public class CreateSEPAPaymentDTO {
 	public void setDestinationIban(String destinationIban) {
 		this.destinationIban = destinationIban;
 	}
+
+	@Override
+	public String toString() {
+		return "CreateSEPAPaymentDTO [amount=" + amount + ", currency=" + currency + ", destinationIban="
+				+ destinationIban + "]";
+	}
+	
+	
 }
